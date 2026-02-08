@@ -60,13 +60,13 @@ export class AuthService {
         catchError((error) => {
           console.error('Login error:', error);
           return of(false);
-        })
+        }),
       );
   }
 
   logout(): void {
     const token = this.getToken();
-    
+
     if (token) {
       // Call logout endpoint
       this.http
@@ -81,7 +81,7 @@ export class AuthService {
 
   refreshToken(): Observable<boolean> {
     const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
-    
+
     if (!refreshToken) {
       return of(false);
     }
@@ -100,7 +100,7 @@ export class AuthService {
         catchError(() => {
           this.clearAuth();
           return of(false);
-        })
+        }),
       );
   }
 
@@ -110,7 +110,7 @@ export class AuthService {
 
   private verifyToken(): void {
     const token = this.getToken();
-    
+
     if (!token) {
       return;
     }
@@ -129,7 +129,7 @@ export class AuthService {
         catchError(() => {
           this.clearAuth();
           return of(null);
-        })
+        }),
       )
       .subscribe();
   }
@@ -139,7 +139,7 @@ export class AuthService {
     this.tokenSignal.set(token);
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-    
+
     if (refreshToken) {
       localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
     }
