@@ -1,0 +1,257 @@
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Videos</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        A list of all generated videos with their details and upload status.
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <div class="inline-flex rounded-md shadow-sm" role="group">
+        <button
+          type="button"
+          (click)="filterByLanguage(undefined)"
+          [class.bg-indigo-600]="!selectedLanguage()"
+          [class.text-white]="!selectedLanguage()"
+          [class.bg-white]="selectedLanguage()"
+          [class.text-gray-700]="selectedLanguage()"
+          class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-lg hover:bg-gray-50 focus:z-10"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          (click)="filterByLanguage('es')"
+          [class.bg-indigo-600]="selectedLanguage() === 'es'"
+          [class.text-white]="selectedLanguage() === 'es'"
+          [class.bg-white]="selectedLanguage() !== 'es'"
+          [class.text-gray-700]="selectedLanguage() !== 'es'"
+          class="px-4 py-2 text-sm font-medium border-t border-b border-gray-300 hover:bg-gray-50 focus:z-10"
+        >
+          Español
+        </button>
+        <button
+          type="button"
+          (click)="filterByLanguage('en')"
+          [class.bg-indigo-600]="selectedLanguage() === 'en'"
+          [class.text-white]="selectedLanguage() === 'en'"
+          [class.bg-white]="selectedLanguage() !== 'en'"
+          [class.text-gray-700]="selectedLanguage() !== 'en'"
+          class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-r-lg hover:bg-gray-50 focus:z-10"
+        >
+          English
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="flex justify-center items-center h-64 mt-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="rounded-md bg-red-50 p-4 mt-8">
+      <div class="flex">
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">{{ error() }}</h3>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Videos List -->
+  @if (!isLoading() && !error()) {
+    <div class="mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                  >
+                    Video
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Language
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Duration
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Size
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Status
+                  </th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Created
+                  </th>
+                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                @for (video of videos(); track video.id) {
+                  <tr>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                          <div
+                            class="h-10 w-10 rounded bg-gray-200 flex items-center justify-center"
+                          >
+                            <svg
+                              class="h-6 w-6 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                              />
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="font-medium text-gray-900">
+                            {{ video.topic?.title || 'Untitled' }}
+                          </div>
+                          <div class="text-gray-500">{{ video.width }}x{{ video.height }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <span
+                        class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {{
+                          getLanguageColor(video.language)
+                        }}"
+                      >
+                        {{ getLanguageLabel(video.language) }}
+                      </span>
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {{ formatDuration(video.durationSeconds) }}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {{ formatFileSize(video.fileSizeMb) }}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      @if (video.upload) {
+                        <span
+                          class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {{
+                            getStatusColor(video.upload.privacyStatus)
+                          }}"
+                        >
+                          {{ video.upload.privacyStatus }}
+                        </span>
+                        <a
+                          [href]="video.upload.youtubeUrl"
+                          target="_blank"
+                          class="ml-2 text-indigo-600 hover:text-indigo-900"
+                        >
+                          <svg
+                            class="inline h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      } @else {
+                        <span
+                          class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 bg-gray-100 text-gray-800"
+                        >
+                          Not uploaded
+                        </span>
+                      }
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {{ formatDate(video.createdAt) }}
+                    </td>
+                    <td
+                      class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+                    >
+                      <a
+                        [routerLink]="['/videos', video.id]"
+                        class="text-indigo-600 hover:text-indigo-900 mr-4"
+                        >View</a
+                      >
+                      <button
+                        type="button"
+                        (click)="deleteVideo(video)"
+                        class="text-red-600 hover:text-red-900"
+                        title="Delete video"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav
+      class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4"
+      aria-label="Pagination"
+    >
+      <div class="hidden sm:block">
+        <p class="text-sm text-gray-700">
+          Showing
+          <span class="font-medium">{{ (currentPage() - 1) * pageSize + 1 }}</span>
+          to
+          <span class="font-medium">{{ Math.min(currentPage() * pageSize, total()) }}</span>
+          of
+          <span class="font-medium">{{ total() }}</span>
+          results
+        </p>
+      </div>
+      <div class="flex flex-1 justify-between sm:justify-end">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+          [class.opacity-50]="currentPage() === 1"
+          [class.cursor-not-allowed]="currentPage() === 1"
+          class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+        >
+          Previous
+        </button>
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage() >= totalPages"
+          [class.opacity-50]="currentPage() >= totalPages"
+          [class.cursor-not-allowed]="currentPage() >= totalPages"
+          class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+        >
+          Next
+        </button>
+      </div>
+    </nav>
+  }
+</div>

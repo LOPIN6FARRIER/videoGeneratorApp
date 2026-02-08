@@ -1,0 +1,679 @@
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="sm:flex sm:items-center mb-6">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">
+        @if (channelId() === 'new' || channelId() === null) {
+          New Channel
+        } @else if (isEditMode()) {
+          Edit Channel
+        } @else {
+          Channel Details
+        }
+      </h1>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16">
+      <button
+        routerLink="/channels"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Back to Channels
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-12">
+      <p class="text-gray-500">Loading...</p>
+    </div>
+  } @else if (error()) {
+    <div class="rounded-md bg-red-50 p-4 mb-6">
+      <p class="text-sm text-red-800">{{ error() }}</p>
+    </div>
+  }
+
+  <form (ngSubmit)="onSubmit()" class="space-y-8">
+    <!-- Basic Information -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Basic Information</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Language</label>
+            <select
+              [(ngModel)]="channel().language"
+              name="language"
+              [disabled]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              required
+            >
+              <option value="es">Spanish (es)</option>
+              <option value="en">English (en)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Channel Name</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().name"
+              name="name"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Voice</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().voice"
+              name="voice"
+              [readonly]="isViewMode()"
+              placeholder="es-MX-DaliaNeural"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Voice Rate</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().voice_rate"
+              name="voice_rate"
+              [readonly]="isViewMode()"
+              placeholder="+8%"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Voice Pitch</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().voice_pitch"
+              name="voice_pitch"
+              [readonly]="isViewMode()"
+              placeholder="+2Hz"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Cron Schedule</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().cron_schedule"
+              name="cron_schedule"
+              [readonly]="isViewMode()"
+              placeholder="0 0,8,16 * * *"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">
+              Group
+              <span class="text-xs text-gray-500">(Optional - for multi-language videos)</span>
+            </label>
+            <select
+              [(ngModel)]="channel().group_id"
+              name="group_id"
+              [disabled]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            >
+              <option [ngValue]="null">-- No Group (Independent) --</option>
+              @for (group of groups(); track group.id) {
+                <option [value]="group.id">
+                  {{ group.name }} ({{ group.channels_count }} channels)
+                </option>
+              }
+            </select>
+            <p class="mt-1 text-xs text-gray-500">
+              Channels in the same group will generate identical content in different languages
+            </p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                [(ngModel)]="channel().enabled"
+                name="enabled"
+                [disabled]="isViewMode()"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+              <span class="ml-2 text-sm text-gray-700">Channel Enabled</span>
+            </label>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                [(ngModel)]="channel().upload_as_short"
+                name="upload_as_short"
+                [disabled]="isViewMode()"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+              <span class="ml-2 text-sm text-gray-700">Upload as YouTube Short</span>
+            </label>
+            <p class="mt-1 text-xs text-gray-500 ml-6">
+              If unchecked, videos will be uploaded as regular YouTube videos with standard URLs
+              (watch?v=)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual Configuration -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Visual Configuration</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Subtitle Color</label>
+            <div class="mt-1 flex gap-2">
+              <input
+                type="color"
+                [(ngModel)]="channel().subtitle_color"
+                name="subtitle_color"
+                [disabled]="isViewMode()"
+                class="h-10 w-20 rounded border-gray-300 disabled:bg-gray-100"
+              />
+              <input
+                type="text"
+                [(ngModel)]="channel().subtitle_color"
+                name="subtitle_color_text"
+                [readonly]="isViewMode()"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Subtitle Outline Color</label>
+            <div class="mt-1 flex gap-2">
+              <input
+                type="color"
+                [(ngModel)]="channel().subtitle_outline_color"
+                name="subtitle_outline_color"
+                [disabled]="isViewMode()"
+                class="h-10 w-20 rounded border-gray-300 disabled:bg-gray-100"
+              />
+              <input
+                type="text"
+                [(ngModel)]="channel().subtitle_outline_color"
+                name="subtitle_outline_color_text"
+                [readonly]="isViewMode()"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Font Size</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().font_size"
+              name="font_size"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Max Chars Per Line</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().max_chars_per_line"
+              name="max_chars_per_line"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Configuration -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Video Configuration</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Video Width</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().video_width"
+              name="video_width"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Video Height</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().video_height"
+              name="video_height"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Video FPS</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().video_fps"
+              name="video_fps"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Max Duration (seconds)</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().video_max_duration"
+              name="video_max_duration"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                [(ngModel)]="channel().use_pexels_videos"
+                name="use_pexels_videos"
+                [disabled]="isViewMode()"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+              <span class="ml-2 text-sm text-gray-700">Use Pexels Videos</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube Configuration -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">YouTube Configuration</h3>
+          @if (channelId() && channelId() !== 'new') {
+            <div class="flex items-center gap-3">
+              @if (authStatus().isAuthenticated) {
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                  >
+                    ✓ Connected
+                  </span>
+                  @if (authStatus().expiresAt) {
+                    <span class="text-xs text-gray-500">
+                      Expires: {{ authStatus().expiresAt | date: 'short' }}
+                    </span>
+                  }
+                  <button
+                    type="button"
+                    (click)="disconnectYouTube()"
+                    class="text-xs text-red-600 hover:text-red-800"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              } @else {
+                <button
+                  type="button"
+                  (click)="connectYouTube()"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                    />
+                  </svg>
+                  Connect YouTube
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <div class="text-sm text-gray-600 bg-blue-50 p-4 rounded-md">
+          <p>✓ OAuth credentials are automatically configured from google.json on the server</p>
+          <p class="mt-1 text-xs">
+            After saving the channel, click "Connect YouTube" to authorize access
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    @if (!isViewMode()) {
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          routerLink="/channels"
+          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
+        >
+          {{ channelId() === 'new' || channelId() === null ? 'Create' : 'Update' }} Channel
+        </button>
+      </div>
+    }
+  </form>
+
+  <!-- Prompts Section -->
+  @if (channelId() && channelId() !== 'new') {
+    <div class="mt-8 bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Prompts</h3>
+          @if (!isViewMode()) {
+            <button
+              type="button"
+              (click)="openCreatePromptModal()"
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Add Prompt
+            </button>
+          }
+        </div>
+
+        @if (prompts().length === 0) {
+          <p class="text-sm text-gray-500">No prompts configured for this channel.</p>
+        } @else {
+          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    class="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                  >
+                    Type
+                  </th>
+                  <th
+                    class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                  >
+                    Status
+                  </th>
+                  @if (!isViewMode()) {
+                    <th class="relative py-3 pl-3 pr-4 sm:pr-6">
+                      <span class="sr-only">Actions</span>
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                @for (prompt of prompts(); track prompt.id) {
+                  <tr>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                      {{ getPromptTypeLabel(prompt.type) }}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {{ prompt.name }}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                      <span
+                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        [class.bg-green-100]="prompt.enabled"
+                        [class.text-green-800]="prompt.enabled"
+                        [class.bg-gray-100]="!prompt.enabled"
+                        [class.text-gray-800]="!prompt.enabled"
+                      >
+                        {{ prompt.enabled ? 'Enabled' : 'Disabled' }}
+                      </span>
+                    </td>
+                    @if (!isViewMode()) {
+                      <td
+                        class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+                      >
+                        <button
+                          type="button"
+                          (click)="openEditPromptModal(prompt)"
+                          class="text-indigo-600 hover:text-indigo-900 mr-4"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          (click)="deletePrompt(prompt)"
+                          class="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Prompt Modal -->
+@if (showPromptModal()) {
+  <div
+    class="fixed inset-0 z-50 overflow-y-auto"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <!-- Background overlay -->
+    <div
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      (click)="closePromptModal()"
+    ></div>
+
+    <!-- Modal container -->
+    <div class="flex min-h-full items-center justify-center p-4">
+      <!-- Modal panel -->
+      <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full z-50">
+        <div class="px-6 pt-6 pb-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
+            {{ editingPrompt() ? 'Edit Prompt' : 'New Prompt' }}
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Type -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Type</label>
+              <select
+                [(ngModel)]="promptForm().type"
+                name="prompt_type"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                <option value="topic">Topic</option>
+                <option value="script">Script</option>
+                <option value="title">Title</option>
+                <option value="description">Description</option>
+              </select>
+            </div>
+
+            <!-- Name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                [(ngModel)]="promptForm().name"
+                name="prompt_name"
+                placeholder="e.g., Micro-documental Cotidiano"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
+            </div>
+
+            <!-- Prompt Text -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Prompt Text</label>
+              <textarea
+                [(ngModel)]="promptForm().prompt_text"
+                name="prompt_text"
+                rows="15"
+                placeholder="Enter the full prompt text that will be sent to OpenAI..."
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono text-sm"
+              ></textarea>
+            </div>
+
+            <!-- Enabled -->
+            <div>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="promptForm().enabled"
+                  name="prompt_enabled"
+                  class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <span class="ml-2 text-sm text-gray-700">Enabled</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-6 py-3 flex flex-row-reverse gap-3">
+          <button
+            type="button"
+            (click)="savePrompt()"
+            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            {{ editingPrompt() ? 'Update' : 'Create' }}
+          </button>
+          <button
+            type="button"
+            (click)="closePromptModal()"
+            class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- OAuth Manual Code Modal -->
+@if (showOAuthModal()) {
+  <div
+    class="fixed inset-0 z-50 overflow-y-auto"
+    aria-labelledby="oauth-modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <!-- Background overlay -->
+    <div
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      (click)="closeOAuthModal()"
+    ></div>
+
+    <!-- Modal container -->
+    <div class="flex min-h-full items-center justify-center p-4">
+      <!-- Modal panel -->
+      <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full z-50">
+        <div class="px-6 pt-6 pb-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="oauth-modal-title">
+            Connect YouTube Account
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Instructions -->
+            <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+              <h4 class="text-sm font-semibold text-blue-900 mb-2">Instructions:</h4>
+              <ol class="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <li>Click the "Open Google Authorization" button below</li>
+                <li>Sign in with your Google account and grant permissions</li>
+                <li>Copy the authorization code from the URL (after "code=")</li>
+                <li>Paste the code in the field below and click "Connect"</li>
+              </ol>
+            </div>
+
+            <!-- Auth URL Display -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Authorization URL:
+              </label>
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  [value]="oauthUrl()"
+                  readonly
+                  class="flex-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm text-xs font-mono"
+                />
+                <button
+                  type="button"
+                  (click)="openOAuthUrl()"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                    />
+                  </svg>
+                  Open Google Authorization
+                </button>
+              </div>
+            </div>
+
+            <!-- Code Input -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Authorization Code:
+              </label>
+              <textarea
+                [(ngModel)]="oauthCode"
+                name="oauth_code"
+                rows="3"
+                placeholder="Paste the authorization code here (e.g., 4/0AdEu...)"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono text-sm"
+              ></textarea>
+              <p class="mt-1 text-xs text-gray-500">
+                The code is in the URL after "code=" parameter. Copy everything until the "&" or end
+                of URL.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-6 py-3 flex flex-row-reverse gap-3">
+          <button
+            type="button"
+            (click)="submitOAuthCode()"
+            [disabled]="!oauthCode() || loading()"
+            class="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ loading() ? 'Connecting...' : 'Connect YouTube' }}
+          </button>
+          <button
+            type="button"
+            (click)="closeOAuthModal()"
+            [disabled]="loading()"
+            class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
