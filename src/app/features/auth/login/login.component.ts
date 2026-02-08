@@ -40,18 +40,19 @@ export class LoginComponent {
 
       const { email, password } = this.loginForm.value;
 
-      // Simulate API call
-      setTimeout(() => {
-        const success = this.authService.login(email, password);
-
-        if (success) {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.errorMessage.set('Invalid credentials');
-        }
-
-        this.loading.set(false);
-      }, 500);
+      this.authService.login(email, password).subscribe({
+        next: (success) => {
+          this.loading.set(false);
+          if (!success) {
+            this.errorMessage.set('Invalid credentials');
+          }
+        },
+        error: (error) => {
+          this.loading.set(false);
+          this.errorMessage.set('Login failed. Please try again.');
+          console.error('Login error:', error);
+        },
+      });
     }
   }
 }
