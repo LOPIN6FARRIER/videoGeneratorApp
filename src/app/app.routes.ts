@@ -24,6 +24,13 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
       },
       {
+        path: 'change-password',
+        loadComponent: () =>
+          import('./features/auth/change-password/change-password.component').then(
+            (m) => m.ChangePasswordComponent,
+          ),
+      },
+      {
         path: 'channels',
         loadComponent: () =>
           import('./features/channels/channels-list/channels-list.component').then(

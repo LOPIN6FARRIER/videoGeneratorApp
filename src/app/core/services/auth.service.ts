@@ -33,14 +33,17 @@ export class AuthService {
   // Signals
   private userSignal = signal<User | null>(this.getUserFromStorage());
   private tokenSignal = signal<string | null>(this.getTokenFromStorage());
+  private verificationInProgress = signal<boolean>(false);
 
   // Computed
   user = computed(() => this.userSignal());
   isAuthenticated = computed(() => !!this.tokenSignal());
 
   constructor() {
-    // Verify token on initialization
-    this.verifyToken();
+    // Verify token on initialization if exists
+    if (this.getTokenFromStorage()) {
+      this.verifyTokenSilently();
+    }
   }
 
   login(email: string, password: string): Observable<boolean> {
@@ -79,6 +82,28 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  changePassword(oldPassword: string, newPassword: string): Observable<boolean> {
+    return this.http
+      .post<{ success: boolean; message: string }>(`${environment.apiUrl}/auth/change-password`, {
+        oldPassword,
+        newPassword,
+      })
+      .pipe(
+        tap((response) => {
+          if (response.success) {
+            // Password changed, logout and redirect to login
+            this.clearAuth();
+            this.router.navigate(['/login']);
+          }
+        }),
+        map((response) => response.success),
+        catchError((error) => {
+          console.error('Change password error:', error);
+          return of(false);
+        }),
+      );
+  }
+
   refreshToken(): Observable<boolean> {
     const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
 
@@ -108,12 +133,18 @@ export class AuthService {
     return this.tokenSignal();
   }
 
-  private verifyToken(): void {
+  isVerifying(): boolean {
+    return this.verificationInProgress();
+  }
+
+  private verifyTokenSilently(): void {
     const token = this.getToken();
 
     if (!token) {
       return;
     }
+
+    this.verificationInProgress.set(true);
 
     // Verify token with backend
     this.http
@@ -123,11 +154,19 @@ export class AuthService {
           if (response.success && response.user) {
             this.userSignal.set(response.user);
           } else {
+            // Token is invalid, clear auth
             this.clearAuth();
           }
+          this.verificationInProgress.set(false);
         }),
-        catchError(() => {
-          this.clearAuth();
+        catchError((error) => {
+          console.warn('Token verification failed, keeping session:', error);
+          // Don't clear auth on network errors - keep the session
+          // Only clear if it's a 401 Unauthorized
+          if (error.status === 401) {
+            this.clearAuth();
+          }
+          this.verificationInProgress.set(false);
           return of(null);
         }),
       )
