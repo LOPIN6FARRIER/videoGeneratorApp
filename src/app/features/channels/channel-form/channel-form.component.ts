@@ -70,6 +70,19 @@ export class ChannelFormComponent implements OnInit {
     video_max_duration: 60,
     use_pexels_videos: false,
     upload_as_short: true,
+    // Narrative & effects (migration 013)
+    font_family: 'Montserrat',
+    target_duration: 52,
+    hook_duration: 2.0,
+    pacing: 'fast',
+    words_per_second: 2.8,
+    background_music_enabled: false,
+    background_music_volume: 0.15,
+    ken_burns_enabled: true,
+    ken_burns_zoom: 1.15,
+    pan_enabled: true,
+    pan_speed: 50,
+    subtitle_position: 'center',
   });
 
   ngOnInit(): void {
@@ -138,6 +151,21 @@ export class ChannelFormComponent implements OnInit {
       videoMaxDuration: channelData.video_max_duration,
       usePexelsVideos: channelData.use_pexels_videos,
       uploadAsShort: channelData.upload_as_short,
+      // Narrative & effects (migration 013)
+      primaryColor: channelData.primary_color,
+      secondaryColor: channelData.secondary_color,
+      fontFamily: channelData.font_family,
+      targetDuration: channelData.target_duration,
+      hookDuration: channelData.hook_duration,
+      pacing: channelData.pacing,
+      wordsPerSecond: channelData.words_per_second,
+      backgroundMusicEnabled: channelData.background_music_enabled,
+      backgroundMusicVolume: channelData.background_music_volume,
+      kenBurnsEnabled: channelData.ken_burns_enabled,
+      kenBurnsZoom: channelData.ken_burns_zoom,
+      panEnabled: channelData.pan_enabled,
+      panSpeed: channelData.pan_speed,
+      subtitlePosition: channelData.subtitle_position,
     };
 
     if (this.channelId() && this.channelId() !== 'new') {

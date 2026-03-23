@@ -303,6 +303,189 @@
       </div>
     </div>
 
+    <!-- Narrative Configuration -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Narrative Configuration</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Target Duration (seconds)</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().target_duration"
+              name="target_duration"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Hook Duration (seconds)</label>
+            <input
+              type="number"
+              step="0.5"
+              [(ngModel)]="channel().hook_duration"
+              name="hook_duration"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Pacing</label>
+            <select
+              [(ngModel)]="channel().pacing"
+              name="pacing"
+              [disabled]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            >
+              <option value="fast">Fast</option>
+              <option value="medium">Medium</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Words Per Second</label>
+            <input
+              type="number"
+              step="0.1"
+              [(ngModel)]="channel().words_per_second"
+              name="words_per_second"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Subtitle Position</label>
+            <select
+              [(ngModel)]="channel().subtitle_position"
+              name="subtitle_position"
+              [disabled]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            >
+              <option value="top">Top</option>
+              <option value="center">Center</option>
+              <option value="bottom">Bottom</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Font Family</label>
+            <input
+              type="text"
+              [(ngModel)]="channel().font_family"
+              name="font_family"
+              [readonly]="isViewMode()"
+              placeholder="Montserrat"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Primary Color (overrides Subtitle Color)</label>
+            <div class="mt-1 flex gap-2">
+              <input
+                type="color"
+                [value]="channel().primary_color || channel().subtitle_color || '#00D7FF'"
+                (change)="channel().primary_color = $any($event.target).value"
+                name="primary_color"
+                [disabled]="isViewMode()"
+                class="h-10 w-20 rounded border-gray-300 disabled:bg-gray-100"
+              />
+              <input
+                type="text"
+                [(ngModel)]="channel().primary_color"
+                name="primary_color_text"
+                [readonly]="isViewMode()"
+                placeholder="Leave empty to use Subtitle Color"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+            </div>
+            <p class="mt-1 text-xs text-gray-500">If empty, uses Subtitle Color as brand color</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Secondary Color</label>
+            <div class="mt-1 flex gap-2">
+              <input
+                type="color"
+                [value]="channel().secondary_color || '#FF6B35'"
+                (change)="channel().secondary_color = $any($event.target).value"
+                name="secondary_color"
+                [disabled]="isViewMode()"
+                class="h-10 w-20 rounded border-gray-300 disabled:bg-gray-100"
+              />
+              <input
+                type="text"
+                [(ngModel)]="channel().secondary_color"
+                name="secondary_color_text"
+                [readonly]="isViewMode()"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Effects -->
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Video Effects</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                [(ngModel)]="channel().ken_burns_enabled"
+                name="ken_burns_enabled"
+                [disabled]="isViewMode()"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+              <span class="ml-2 text-sm text-gray-700">Ken Burns Zoom Effect</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Ken Burns Zoom (1.0 - 1.5)</label>
+            <input
+              type="number"
+              step="0.05"
+              [(ngModel)]="channel().ken_burns_zoom"
+              name="ken_burns_zoom"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                [(ngModel)]="channel().pan_enabled"
+                name="pan_enabled"
+                [disabled]="isViewMode()"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:bg-gray-100"
+              />
+              <span class="ml-2 text-sm text-gray-700">Vertical Pan Effect</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Pan Speed (px/sec)</label>
+            <input
+              type="number"
+              [(ngModel)]="channel().pan_speed"
+              name="pan_speed"
+              [readonly]="isViewMode()"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- YouTube Configuration -->
     <div class="bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:p-6">

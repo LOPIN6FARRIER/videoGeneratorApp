@@ -31,6 +31,21 @@ export interface Channel {
   video_max_duration: number;
   use_pexels_videos: boolean;
   upload_as_short: boolean;
+  // Narrative & effects (migration 013)
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  font_family?: string;
+  target_duration?: number;
+  hook_duration?: number;
+  pacing?: 'fast' | 'medium';
+  words_per_second?: number;
+  background_music_enabled?: boolean;
+  background_music_volume?: number;
+  ken_burns_enabled?: boolean;
+  ken_burns_zoom?: number;
+  pan_enabled?: boolean;
+  pan_speed?: number;
+  subtitle_position?: 'top' | 'center' | 'bottom';
   created_at: string;
   updated_at: string;
 }
@@ -64,6 +79,21 @@ export interface CreateChannelDto {
   videoMaxDuration?: number;
   usePexelsVideos?: boolean;
   uploadAsShort?: boolean;
+  // Narrative & effects (migration 013)
+  primaryColor?: string | null;
+  secondaryColor?: string | null;
+  fontFamily?: string;
+  targetDuration?: number;
+  hookDuration?: number;
+  pacing?: 'fast' | 'medium';
+  wordsPerSecond?: number;
+  backgroundMusicEnabled?: boolean;
+  backgroundMusicVolume?: number;
+  kenBurnsEnabled?: boolean;
+  kenBurnsZoom?: number;
+  panEnabled?: boolean;
+  panSpeed?: number;
+  subtitlePosition?: 'top' | 'center' | 'bottom';
 }
 
 @Injectable({
